@@ -58,7 +58,7 @@ if args.method.startswith("pgd"):
 else:
     node_epsilon = args.small_eps * np.ones(50000)
     config["model_dir"] = "models/pgd-{}_{}_{}".format(args.method, args.small_eps, args.eps)
-    with open("node_spade_score.pkl".format(args.knn, args.eigens), 'rb') as fin :
+    with open("node_spade_score.pkl", 'rb') as fin :
         node_score = pickle.load(fin)
     if args.method=="rand":
         np.random.shuffle(node_score)
