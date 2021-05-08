@@ -12,6 +12,7 @@ from timeit import default_timer as timer
 
 import tensorflow as tf
 import numpy as np
+import random
 
 from model import Model
 import cifar10_input
@@ -52,18 +53,20 @@ data_path = config['data_path']
 momentum = config['momentum']
 batch_size = config['training_batch_size']
 
+node_epsilon = args.eps * np.ones(50000)
 if args.method.startswith("pgd"):
-    node_epsilon = args.eps * np.ones(50000)
     config["model_dir"] = "models/{}_{}".format(args.method, args.eps)
-else:
-    node_epsilon = args.small_eps * np.ones(50000)
+elif args.method=="spade":
     config["model_dir"] = "models/pgd-{}_{}_{}".format(args.method, args.small_eps, args.eps)
     with open("node_spade_score.pkl", 'rb') as fin :
-        node_score = pickle.load(fin)
-    if args.method=="rand":
-        np.random.shuffle(node_score)
-    idx = (-node_score).argsort()[:args.topk]
-    node_epsilon[idx] = args.eps
+        node_score = (pickle.load(fin)).reshape(-1,)
+        idx = (-node_score).argsort()
+    sub_idx = idx[args.topk:]
+    node_epsilon[sub_idx] = args.small_eps
+elif args.method=="random":
+    config["model_dir"] = "models/pgd-{}_{}_{}".format(args.method, args.small_eps, args.eps)
+    node_epsilon = np.asarray(random.choices([args.small_eps, args.eps], k=50000))
+
 
 # Setting up the data and the model
 raw_cifar = cifar10_input.CIFAR10Data(data_path, node_epsilon.reshape(-1,1,1,1), config["epsilon"])

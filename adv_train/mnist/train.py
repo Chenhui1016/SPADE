@@ -15,6 +15,7 @@ from timeit import default_timer as timer
 import tensorflow as tf
 import numpy as np
 from numpy.random import permutation
+import random
 from tensorflow.examples.tutorials.mnist import input_data
 
 from model import Model
@@ -50,15 +51,16 @@ num_batches = int(math.ceil(num_samples/batch_size))
 node_epsilon = args.eps * np.ones(x_train.shape[0])
 if args.method.startswith("pgd"):
     config["model_dir"] = "models/{}_{}".format(args.method, args.eps)
-else:
+elif args.method == "spade":
     config["model_dir"] = "models/pgd-{}_{}_{}".format(args.method, args.small_eps, args.eps)
     with open("node_spade_score.pkl", 'rb') as fin :
-        node_score = pickle.load(fin)
-    if args.method=="rand":
-        np.random.seed(seed=1234)
-        np.random.shuffle(node_score)
-    idx = (-node_score).argsort()[args.topk:]
-    node_epsilon[idx] = args.small_eps
+        node_score = (pickle.load(fin)).reshape(-1,)
+        idx = (-node_score).argsort()
+        sub_idx = idx[args.topk:]
+        node_epsilon[sub_idx] = args.small_eps
+elif args.method.startswith("random"):
+    config["model_dir"] = "models/pgd-{}_{}_{}".format(args.method, args.small_eps, args.eps)
+    node_epsilon = np.asarray(random.choices([args.small_eps, args.eps], k=num_samples))
 
 np.random.seed()
 x_train = np.concatenate((x_train, node_epsilon.reshape(-1,1)), axis=1)
