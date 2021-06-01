@@ -1,3 +1,8 @@
+"""
+The code is adapted from the MadryLab's repo:
+https://github.com/MadryLab/mnist_challenge/pgd_attack.py
+"""
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -13,7 +18,6 @@ class LinfPGDAttack:
        size a, while always staying within epsilon from the initial
        point."""
     self.model = model
-    #self.epsilon = epsilon
     self.k = k
     self.a = a
     self.rand = random_start

@@ -1,16 +1,18 @@
+"""
+The code is adapted from the MadryLab's repo:
+https://github.com/MadryLab/mnist_challenge/eval.py
+"""
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from datetime import datetime
 import json
 import math
 import os
 import sys
 import argparse
-import time
 import numpy as np
-from csv import writer
 
 import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data
@@ -22,7 +24,7 @@ from pgd_attack import LinfPGDAttack
 parser = argparse.ArgumentParser(description='adv_training')
 parser.add_argument('--device', type=int, default=0)
 parser.add_argument('--cpu', action='store_true')
-parser.add_argument('--eps', type=float, default=0.3)
+parser.add_argument('--eps', type=float, default=0.4)
 parser.add_argument('--k', type=int, default=100)
 parser.add_argument('--restarts', type=int, default=1)
 parser.add_argument('--loss', type=str, default="xent",
@@ -35,7 +37,7 @@ args = parser.parse_args()
 print(args)
 
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"]="{}".format(args.device)  # specify which GPU(s) to be used
+os.environ["CUDA_VISIBLE_DEVICES"]="{}".format(args.device)
 
 # Global constants
 with open('config.json') as config_file:
@@ -45,17 +47,16 @@ config["k"] = args.k
 config["loss_func"] = args.loss
 
 if args.method=="pgd":
-    config["model_dir"] = "models/pgd_0.3"
+    config["model_dir"] = "models/pgd_0.4"
 elif args.method=="clean":
     config["model_dir"] = "models/pgd_0.0"
 else:
-    config["model_dir"] = "models/pgd-{}_0.2_0.3".format(args.method)
+    config["model_dir"] = "models/pgd-{}_0.2_0.4".format(args.method)
 
 num_eval_examples = config['num_eval_examples']
 eval_batch_size = config['eval_batch_size']
-eval_on_cpu = args.cpu
-
 model_dir = config['model_dir']
+eval_on_cpu = args.cpu
 
 # Set upd the data, hyperparameters, and the model
 mnist = input_data.read_data_sets('MNIST_data', one_hot=False)

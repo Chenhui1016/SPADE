@@ -1,7 +1,4 @@
 {
-  "_comment": "===== MODEL CONFIGURATION =====",
-  "model_dir": "models/adv_trained",
-
   "_comment": "===== TRAINING CONFIGURATION =====",
   "random_seed": 4557077,
   "max_num_training_steps": 100000,
@@ -16,8 +13,6 @@
   "eval_on_cpu": true,
 
   "_comment": "=====ADVERSARIAL EXAMPLES CONFIGURATION=====",
-  "epsilon": 0.3,
-  "k": 100,
   "a": 0.01,
   "random_start": true,
   "loss_func": "xent",
